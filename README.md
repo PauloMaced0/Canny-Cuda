@@ -85,7 +85,7 @@ This command runs the Canny edge detector using the default values for:
 
 Input image:
 
-![images/jetplane.pgm](jetplane.pgm)
+![jetplane.pgm](./images/jetplane.png)
 
 After execution, the program generates two `.pgm` output files:
 
@@ -97,7 +97,7 @@ The outputs are expected to be nearly identical (see [Output Quality ](output-qu
 
 Example GPU output:
 
-![out.pgm](out.pgm)
+![out.pgm](./out.pgm)
 
 ## Performance Analysis 
 
