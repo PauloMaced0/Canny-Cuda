@@ -97,7 +97,7 @@ The outputs are expected to be nearly identical (see [Output Quality ](output-qu
 
 Example GPU output:
 
-![out.pgm](./out.pgm)
+![out.pgm](./out.png)
 
 ## Performance Analysis 
 
