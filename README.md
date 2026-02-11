@@ -1,5 +1,6 @@
-# Canny-Cuda
-Canny Edge Detector with CUDA Programming
+# Canny-Cuda (Canny Edge Detector with CUDA Programming)
+
+The Canny Edge Detector is a popular, multi-stage computer vision algorithm developed in 1986 to extract useful structural information from images while minimizing noise. It identifies object boundaries by detecting sharp changes in brightness through a process involving Gaussian smoothing, gradient calculation, non-maximum suppression, and hysteresis thresholding.
 
 ## Summary of the approach
 
@@ -71,25 +72,36 @@ Run the executable from the ~/cuda-canny directory:
 
 ### Example:
 ```bash
-./canny -i images/lake.pgm -o result.pgm -s 1.4 -n 30 -x 60
+./canny -i images/jetplane.pgm
 ```
 
-## Directory Structure
+This command runs the Canny edge detector using the default values for:
 
-```
-~/cuda-canny/
-├── images/
-│   └── lake.pgm        # Example input image
-├── out.pgm             # Output after edge detection
-├── reference.pgm       # Optional reference output
-├── canny               # Compiled executable
-├── Makefile
-└── src/                # Source files
-```
+- Sigma
+
+- Minimum threshold
+
+- Maximum threshold
+
+Input image:
+
+![images/jetplane.pgm](jetplane.pgm)
+
+After execution, the program generates two `.pgm` output files:
+
+- `reference.pgm`: Generated using the **CPU (host)** implementation
+
+- `out.pgm`: Generated using the GPU **(CUDA device)** implementation
+
+The outputs are expected to be nearly identical (see [Output Quality ](output-quality)) . Significant differences would indicate an issue in the GPU implementation.
+
+Example GPU output:
+
+![out.pgm](out.pgm)
 
 ## Performance Analysis 
 
-To evaluate the performance of the CUDA-accelerated Canny Edge Detector, we ran the implementation 100 times with default parameters and compared execution times between the CPU (host) and GPU (device) versions.
+The performance of the CUDA-accelerated Canny Edge Detector was evaluated over **100 executions** using default parameters. Execution times of the CPU (host) and GPU (device) implementations were compared.
 
 ### Execution Time
 
@@ -100,26 +112,21 @@ To evaluate the performance of the CUDA-accelerated Canny Edge Detector, we ran 
 
 ### Speedup
 
+The speedup achieved by the GPU implementation is calculated as:
+
 ```
 Speedup = CPU_Time / GPU_Time
         = 32.92 / 1.34 ≈ 24.6×
 ```
 
+This demonstrates a significant performance improvement when using CUDA acceleration.
+
 ### Output Quality
 
-**Pixel difference**: 1 / 262144 (≈ 0.0004%)
+In the worst-case scenario (using `walkbridge.pgm` with default parameters), the GPU output differs from the CPU reference by only:
 
-The device and host output images are nearly identical, demonstrating correctness of the CUDA implementation.
+- **2 pixels out of 262,144 total pixels**
 
-### Sigma Variation Analysis
+- **≈ 0.0008% error rate**
 
-To evaluate how the Gaussian blur parameter (`sigma`) affects performance and accuracy, we ran the program 10 times for each of several sigma values while keeping other parameters default. We recorded the average host time, device time, speedup, and pixel difference between host and device outputs.
-
-| Sigma | Avg Host Time (ms) | Avg Device Time (ms) | Speedup | Avg Diff Pixels |
-|-------|--------------------|-----------------------|---------|-----------------|
-| 0.5   | 40.20              | 1.27                  | 31.70×  | 3               |
-| 1.0   | 32.12              | 1.34                  | 23.92×  | 1               |
-| 1.5   | 36.61              | 1.34                  | 27.32×  | 1               |
-| 2.0   | 44.68              | 1.41                  | 31.62×  | 6               |
-| 2.5   | 51.06              | 1.55                  | 33.02×  | 3               |
-| 3.0   | 61.52              | 1.70                  | 36.27×  | 0               |
+This extremely small discrepancy confirms that the GPU implementation maintains **high numerical accuracy** while achieving substantial performance gains.
