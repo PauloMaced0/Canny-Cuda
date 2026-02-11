@@ -85,7 +85,7 @@ This command runs the Canny edge detector using the default values for:
 
 Input image:
 
-![jetplane.pgm](./images/jetplane.png)
+![jetplane.pgm](./jetplane.png)
 
 After execution, the program generates two `.pgm` output files:
 
