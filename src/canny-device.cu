@@ -1,4 +1,3 @@
-// CLE 24'25
 
 // includes, system
 #include <stdlib.h>
