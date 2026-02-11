@@ -172,7 +172,7 @@ __global__ void hysteresis_edges_device(
         const int Nx, 
         const int Ny, 
         const int tmin, 
-        bool *dchanged
+        int *dchanged
         ) {
     int ix = blockIdx.x * blockDim.x + threadIdx.x;
     int iy = blockIdx.y * blockDim.y + threadIdx.y;
@@ -192,9 +192,10 @@ __global__ void hysteresis_edges_device(
             };
             for (int k = 0; k < 8; k++) {
                 if (reference[neighbors[k]] != 0) {
-                    reference[idx] = MAX_BRIGHTNESS;
-                    //FIX - There's a race condition here !
-                    *dchanged = true;
+                    // Only the thread that successfully flips 0 to MAX_BRIGHTNESS
+                    // sets the changed flag, because the others will see MAX_BRIGHTNESS
+                    int old = atomicCAS(&reference[idx], 0, MAX_BRIGHTNESS);
+                    if (old == 0) { *dchanged = 1; };
                     break;
                 }
             }
@@ -343,15 +344,15 @@ __host__ void cannyDevice(
     first_edges_device<<<grid_dim, block_dim>>>(nms, d_reference, Nx, Ny, tmax);
 
     // edges with nms >= tmin && neighbor is edge
-    bool changed;
-    bool *d_changed;
-    cudaMalloc(&d_changed, sizeof(bool));
+    int changed;
+    int *d_changed;
+    cudaMalloc(&d_changed, sizeof(int));
 
     do {
         changed = false;
-        cudaMemcpy(d_changed, &changed, sizeof(bool), cudaMemcpyHostToDevice);
+        cudaMemcpy(d_changed, &changed, sizeof(int), cudaMemcpyHostToDevice);
         hysteresis_edges_device<<<grid_dim, block_dim>>>(nms, d_reference, Nx, Ny, tmin, d_changed);
-        cudaMemcpy(&changed, d_changed, sizeof(bool), cudaMemcpyDeviceToHost);
+        cudaMemcpy(&changed, d_changed, sizeof(int), cudaMemcpyDeviceToHost);
     } while (changed==true);
 
     cudaMemcpy(reference, d_reference, Nx * Ny * sizeof(pixel_t), cudaMemcpyDeviceToHost);
