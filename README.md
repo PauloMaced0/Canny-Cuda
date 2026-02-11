@@ -93,7 +93,7 @@ After execution, the program generates two `.pgm` output files:
 
 - `out.pgm`: Generated using the GPU **(CUDA device)** implementation
 
-The outputs are expected to be nearly identical (see [Output Quality ](output-quality)) . Significant differences would indicate an issue in the GPU implementation.
+The outputs are expected to be nearly identical (see [Output Quality](###output-quality)) . Significant differences would indicate an issue in the GPU implementation.
 
 Example GPU output:
 
